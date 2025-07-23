@@ -1,51 +1,35 @@
 // lib/services/api_service.dart
+import 'package:flutter/foundation.dart'; // For kDebugMode
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import '../models/product.dart';
 
 class ApiService {
   static const String baseUrl = 'https://api.restful-api.dev';
+  static final Dio _dio = Dio(BaseOptions(baseUrl: baseUrl));
 
-  static final Dio _dio = Dio(BaseOptions(baseUrl: baseUrl)); // Dio instance
-
+  // Helper for logging API responses in debug mode
   static void _logResponse(String method, Response? response, DioException? error) {
     if (kDebugMode) {
       print('--- $method Response ---');
-    }
-    if (response != null) {
-      if (kDebugMode) {
+      if (response != null) {
         print('Status Code: ${response.statusCode}');
-      }
-      if (kDebugMode) {
         print('Headers: ${response.headers}');
-      }
-      if (kDebugMode) {
-        print('Body: ${response.data ?? "[No Body]"}');
-      }
-    } else if (error != null) {
-      if (kDebugMode) {
+        print('Body: ${response.data != null ? response.data : "[No Body]"}');
+      } else if (error != null) {
         print('DioException Type: ${error.type}');
-      }
-      if (kDebugMode) {
         print('Status Code: ${error.response?.statusCode}');
-      }
-      if (kDebugMode) {
         print('Message: ${error.message}');
-      }
-      if (kDebugMode) {
         print('Response Body: ${error.response?.data}');
       }
-    }
-    if (kDebugMode) {
       print('------------------------');
     }
   }
 
-  // --- GET Operations ---
-  static Future<List<Product>> fetchAllProducts() async {
+  // GET: list of all objects (https://api.restful-api.dev/objects)
+  static Future<List<Product>> getAllProducts() async {
     try {
       final response = await _dio.get('/objects');
-      _logResponse('GET /objects', response, null);
+      _logResponse('GET /objects (All)', response, null);
 
       if (response.statusCode == 200) {
         List<dynamic> jsonList = response.data;
@@ -54,17 +38,18 @@ class ApiService {
         throw Exception('Failed to load products: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
-      _logResponse('GET /objects', null, e);
+      _logResponse('GET /objects (All)', null, e);
       throw Exception('Failed to load products: ${e.response?.statusCode ?? 'N/A'} - ${e.message}');
     } catch (e) {
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }
   }
 
-  static Future<Product> fetchProductById(String id) async {
+  // GET: single object (https://api.restful-api.dev/objects/7)
+  static Future<Product> getProductById(String id) async {
     try {
       final response = await _dio.get('/objects/$id');
-      _logResponse('GET /objects/$id', response, null);
+      _logResponse('GET /objects/$id (Single)', response, null);
 
       if (response.statusCode == 200) {
         return Product.fromJson(response.data);
@@ -72,15 +57,15 @@ class ApiService {
         throw Exception('Failed to load product with ID $id: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
-      _logResponse('GET /objects/$id', null, e);
+      _logResponse('GET /objects/$id (Single)', null, e);
       throw Exception('Failed to load product with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}');
     } catch (e) {
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }
   }
 
-  // --- POST Operation (Create) ---
-  static Future<Product> createProduct(String name, {Map<String, dynamic>? data}) async {
+  // POST: add objects (https://api.restful-api.dev/objects)
+  static Future<Product> createProduct(String name, Map<String, dynamic>? data) async {
     final Map<String, dynamic> requestBody = {'name': name};
     if (data != null) {
       requestBody['data'] = data;
@@ -89,7 +74,7 @@ class ApiService {
     try {
       final response = await _dio.post(
         '/objects',
-        data: requestBody,
+        data: requestBody, // Dio automatically converts Map to JSON
         options: Options(
           headers: {'Content-Type': 'application/json; charset=UTF-8'},
         ),
@@ -109,13 +94,13 @@ class ApiService {
     }
   }
 
-  // --- PUT Operation (Full Update/Replace) ---
-  static Future<Product> updateProductPut(String id, String name, Map<String, dynamic> data) async {
+  // PUT: update objects (https://api.restful-api.dev/objects/7) - performs a FULL replacement
+  static Future<Product> updateProduct(String id, String name, Map<String, dynamic> data) async {
     try {
       final response = await _dio.put(
         '/objects/$id',
         data: {
-          'id': id,
+          // 'id': id, // Some APIs might require ID in body, but this one doesn't strictly need it here
           'name': name,
           'data': data,
         },
@@ -138,8 +123,8 @@ class ApiService {
     }
   }
 
-  // --- PATCH Operation (Partial Update) ---
-  static Future<Product> updateProductPatch(String id, {String? name, Map<String, dynamic>? data}) async {
+  // PATCH: partially update object (https://api.restful-api.dev/objects/7) - included for completeness
+  static Future<Product> patchProduct(String id, {String? name, Map<String, dynamic>? data}) async {
     final Map<String, dynamic> updatePayload = {};
     if (name != null) {
       updatePayload['name'] = name;
@@ -171,7 +156,7 @@ class ApiService {
     }
   }
 
-  // --- DELETE Operation ---
+  // DELETE: delete object (https://api.restful-api.dev/objects/7)
   static Future<void> deleteProduct(String id) async {
     try {
       final response = await _dio.delete('/objects/$id');
@@ -180,11 +165,6 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         if (kDebugMode) {
           print('Object with ID $id deleted successfully.');
-        }
-        if (response.data != null) {
-          if (kDebugMode) {
-            print('Delete response: ${response.data}');
-          }
         }
       } else {
         throw Exception('Failed to delete product with ID $id: ${response.statusCode} - ${response.data}');
