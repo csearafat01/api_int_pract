@@ -8,7 +8,11 @@ class ApiService {
   static final Dio _dio = Dio(BaseOptions(baseUrl: baseUrl));
 
   // Helper for logging API responses in debug mode
-  static void _logResponse(String method, Response? response, DioException? error) {
+  static void _logResponse(
+    String method,
+    Response? response,
+    DioException? error,
+  ) {
     if (kDebugMode) {
       print('--- $method Response ---');
       if (response != null) {
@@ -35,11 +39,15 @@ class ApiService {
         List<dynamic> jsonList = response.data;
         return jsonList.map((json) => Product.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load products: ${response.statusCode} - ${response.data}');
+        throw Exception(
+          'Failed to load products: ${response.statusCode} - ${response.data}',
+        );
       }
     } on DioException catch (e) {
       _logResponse('GET /objects (All)', null, e);
-      throw Exception('Failed to load products: ${e.response?.statusCode ?? 'N/A'} - ${e.message}');
+      throw Exception(
+        'Failed to load products: ${e.response?.statusCode ?? 'N/A'} - ${e.message}',
+      );
     } catch (e) {
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }
@@ -54,18 +62,25 @@ class ApiService {
       if (response.statusCode == 200) {
         return Product.fromJson(response.data);
       } else {
-        throw Exception('Failed to load product with ID $id: ${response.statusCode} - ${response.data}');
+        throw Exception(
+          'Failed to load product with ID $id: ${response.statusCode} - ${response.data}',
+        );
       }
     } on DioException catch (e) {
       _logResponse('GET /objects/$id (Single)', null, e);
-      throw Exception('Failed to load product with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}');
+      throw Exception(
+        'Failed to load product with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}',
+      );
     } catch (e) {
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }
   }
 
   // POST: add objects (https://api.restful-api.dev/objects)
-  static Future<Product> createProduct(String name, Map<String, dynamic>? data) async {
+  static Future<Product> createProduct(
+    String name,
+    Map<String, dynamic>? data,
+  ) async {
     final Map<String, dynamic> requestBody = {'name': name};
     if (data != null) {
       requestBody['data'] = data;
@@ -84,18 +99,26 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Product.fromJson(response.data);
       } else {
-        throw Exception('Failed to create product: ${response.statusCode} - ${response.data}');
+        throw Exception(
+          'Failed to create product: ${response.statusCode} - ${response.data}',
+        );
       }
     } on DioException catch (e) {
       _logResponse('POST /objects', null, e);
-      throw Exception('Failed to create product: ${e.response?.statusCode ?? 'N/A'} - ${e.message}');
+      throw Exception(
+        'Failed to create product: ${e.response?.statusCode ?? 'N/A'} - ${e.message}',
+      );
     } catch (e) {
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }
   }
 
   // PUT: update objects (https://api.restful-api.dev/objects/7) - performs a FULL replacement
-  static Future<Product> updateProduct(String id, String name, Map<String, dynamic> data) async {
+  static Future<Product> updateProduct(
+    String id,
+    String name,
+    Map<String, dynamic> data,
+  ) async {
     try {
       final response = await _dio.put(
         '/objects/$id',
@@ -113,18 +136,26 @@ class ApiService {
       if (response.statusCode == 200) {
         return Product.fromJson(response.data);
       } else {
-        throw Exception('Failed to update product (PUT) with ID $id: ${response.statusCode} - ${response.data}');
+        throw Exception(
+          'Failed to update product (PUT) with ID $id: ${response.statusCode} - ${response.data}',
+        );
       }
     } on DioException catch (e) {
       _logResponse('PUT /objects/$id', null, e);
-      throw Exception('Failed to update product (PUT) with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}');
+      throw Exception(
+        'Failed to update product (PUT) with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}',
+      );
     } catch (e) {
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }
   }
 
   // PATCH: partially update object (https://api.restful-api.dev/objects/7) - included for completeness
-  static Future<Product> patchProduct(String id, {String? name, Map<String, dynamic>? data}) async {
+  static Future<Product> patchProduct(
+    String id, {
+    String? name,
+    Map<String, dynamic>? data,
+  }) async {
     final Map<String, dynamic> updatePayload = {};
     if (name != null) {
       updatePayload['name'] = name;
@@ -146,11 +177,15 @@ class ApiService {
       if (response.statusCode == 200) {
         return Product.fromJson(response.data);
       } else {
-        throw Exception('Failed to update product (PATCH) with ID $id: ${response.statusCode} - ${response.data}');
+        throw Exception(
+          'Failed to update product (PATCH) with ID $id: ${response.statusCode} - ${response.data}',
+        );
       }
     } on DioException catch (e) {
       _logResponse('PATCH /objects/$id', null, e);
-      throw Exception('Failed to update product (PATCH) with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}');
+      throw Exception(
+        'Failed to update product (PATCH) with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}',
+      );
     } catch (e) {
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }
@@ -167,11 +202,15 @@ class ApiService {
           print('Object with ID $id deleted successfully.');
         }
       } else {
-        throw Exception('Failed to delete product with ID $id: ${response.statusCode} - ${response.data}');
+        throw Exception(
+          'Failed to delete product with ID $id: ${response.statusCode} - ${response.data}',
+        );
       }
     } on DioException catch (e) {
       _logResponse('DELETE /objects/$id', null, e);
-      throw Exception('Failed to delete product with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}');
+      throw Exception(
+        'Failed to delete product with ID $id: ${e.response?.statusCode ?? 'N/A'} - ${e.message}',
+      );
     } catch (e) {
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }

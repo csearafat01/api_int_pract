@@ -4,6 +4,7 @@ import 'dart:convert'; // Required for jsonEncode/jsonDecode if you use it in UI
 class Product {
   final String id;
   final String name;
+
   // The 'data' field from the API can have varying structures,
   // so using Map<String, dynamic>? is the most flexible approach.
   final Map<String, dynamic>? data;

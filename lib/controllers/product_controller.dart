@@ -7,17 +7,21 @@ import '../models/product.dart';
 import '../services/api_service.dart';
 
 class ProductController extends GetxController {
-  var products = <Product>[].obs; // This list will be displayed in the UI (filtered or all)
-  var _allProducts = <Product>[].obs; // Private list to hold all products fetched from the API
+  var products = <Product>[]
+      .obs; // This list will be displayed in the UI (filtered or all)
+  final _allProducts =
+      <Product>[].obs; // Private list to hold all products fetched from the API
   var isLoading = false.obs; // To manage loading state
 
   // Text controllers for UI input fields
-  TextEditingController searchController = TextEditingController(); // For active search, single/multi ID search
+  TextEditingController searchController =
+      TextEditingController(); // For active search, single/multi ID search
   TextEditingController nameController = TextEditingController();
-  TextEditingController dataController = TextEditingController(); // For JSON string input
+  TextEditingController dataController =
+      TextEditingController(); // For JSON string input
 
   // Reactive string for debouncing search input
-  Rx<String> _searchQuery = ''.obs;
+  final Rx<String> _searchQuery = ''.obs;
 
   @override
   void onInit() {
@@ -33,15 +37,19 @@ class ProductController extends GetxController {
     // Debounce the search query updates
     // This delays the execution of the filter method for a short period (e.g., 300ms)
     // after the user stops typing, improving performance.
-    debounce(_searchQuery, (String query) {
-      if (query.isEmpty) {
-        // If the search bar is cleared, display all products
-        products.assignAll(_allProducts);
-      } else {
-        // Otherwise, filter the products based on the query
-        filterProducts(query);
-      }
-    }, time: const Duration(milliseconds: 300)); // Adjust debounce time as needed
+    debounce(
+      _searchQuery,
+      (String query) {
+        if (query.isEmpty) {
+          // If the search bar is cleared, display all products
+          products.assignAll(_allProducts);
+        } else {
+          // Otherwise, filter the products based on the query
+          filterProducts(query);
+        }
+      },
+      time: const Duration(milliseconds: 300),
+    ); // Adjust debounce time as needed
 
     super.onInit();
   }
@@ -87,8 +95,12 @@ class ProductController extends GetxController {
     try {
       isLoading.value = true;
       final fetchedProducts = await ApiService.getAllProducts();
-      _allProducts.assignAll(fetchedProducts); // Store all products in the private list
-      products.assignAll(fetchedProducts); // Initialize the displayed list with all products
+      _allProducts.assignAll(
+        fetchedProducts,
+      ); // Store all products in the private list
+      products.assignAll(
+        fetchedProducts,
+      ); // Initialize the displayed list with all products
     } catch (e) {
       _showErrorSnackbar('Error', 'Failed to load products: ${e.toString()}');
     } finally {
@@ -110,12 +122,15 @@ class ProductController extends GetxController {
           product.name.toLowerCase().contains(lowerCaseQuery);
     }).toList();
 
-    products.assignAll(filtered); // Update the displayed list with filtered results
+    products.assignAll(
+      filtered,
+    ); // Update the displayed list with filtered results
   }
 
   // READ Single Product by ID (Explicit API Call)
   void fetchProductById() async {
-    final id = searchController.text.trim(); // Reads from the common search text field
+    final id = searchController.text
+        .trim(); // Reads from the common search text field
     if (id.isEmpty) {
       _showErrorSnackbar('Input Error', 'Please enter an ID to search.');
       return;
@@ -126,7 +141,10 @@ class ProductController extends GetxController {
       products.assignAll([product]); // Display the single fetched product
       _showSuccessSnackbar('Success', 'Product ID $id found.');
     } catch (e) {
-      _showErrorSnackbar('Error', 'Error fetching product by ID $id: ${e.toString()}');
+      _showErrorSnackbar(
+        'Error',
+        'Error fetching product by ID $id: ${e.toString()}',
+      );
       products.clear(); // Clear the list on error for single ID fetch
     } finally {
       isLoading.value = false;
@@ -135,10 +153,18 @@ class ProductController extends GetxController {
 
   // READ Products by Multiple IDs (Explicit API Call)
   void fetchProductsByMultipleIds() async {
-    final input = searchController.text.trim(); // Reads from the common search text field
-    final ids = input.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final input = searchController.text
+        .trim(); // Reads from the common search text field
+    final ids = input
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
     if (ids.isEmpty) {
-      _showErrorSnackbar('Input Error', 'Please enter at least one ID, separated by commas.');
+      _showErrorSnackbar(
+        'Input Error',
+        'Please enter at least one ID, separated by commas.',
+      );
       return;
     }
 
@@ -149,7 +175,10 @@ class ProductController extends GetxController {
       products.assignAll(fetched); // Display the multiple fetched products
       _showSuccessSnackbar('Success', 'Fetched ${fetched.length} products.');
     } catch (e) {
-      _showErrorSnackbar('Error', 'One or more products not found or error fetching: ${e.toString()}');
+      _showErrorSnackbar(
+        'Error',
+        'One or more products not found or error fetching: ${e.toString()}',
+      );
       products.clear(); // Clear the list on error for multi-ID fetch
     } finally {
       isLoading.value = false;
@@ -179,9 +208,15 @@ class ProductController extends GetxController {
       final newProduct = await ApiService.createProduct(name, dataMap);
       // After creating, re-fetch all products to update both _allProducts and products
       fetchAllProducts();
-      _showSuccessSnackbar('Success', 'Product "${newProduct.name}" created (ID: ${newProduct.id})');
+      _showSuccessSnackbar(
+        'Success',
+        'Product "${newProduct.name}" created (ID: ${newProduct.id})',
+      );
     } catch (e) {
-      _showErrorSnackbar('Create Failed', 'Error creating product: ${e.toString()}');
+      _showErrorSnackbar(
+        'Create Failed',
+        'Error creating product: ${e.toString()}',
+      );
     } finally {
       isLoading.value = false;
       nameController.clear();
@@ -209,15 +244,23 @@ class ProductController extends GetxController {
           throw Exception('Invalid JSON data. Please check format.');
         }
       } else {
-        throw Exception('Product data (JSON) is required for full update (PUT).');
+        throw Exception(
+          'Product data (JSON) is required for full update (PUT).',
+        );
       }
 
       final updated = await ApiService.updateProduct(id, name, dataMap);
       // After updating, re-fetch all products to update both _allProducts and products
       fetchAllProducts();
-      _showSuccessSnackbar('Success', 'Product ID $id updated: ${updated.name}');
+      _showSuccessSnackbar(
+        'Success',
+        'Product ID $id updated: ${updated.name}',
+      );
     } catch (e) {
-      _showErrorSnackbar('Update Failed', 'Error updating product: ${e.toString()}');
+      _showErrorSnackbar(
+        'Update Failed',
+        'Error updating product: ${e.toString()}',
+      );
     } finally {
       isLoading.value = false;
       nameController.clear();
@@ -235,7 +278,10 @@ class ProductController extends GetxController {
       fetchAllProducts();
       _showSuccessSnackbar('Success', 'Product ID $id deleted.');
     } catch (e) {
-      _showErrorSnackbar('Delete Failed', 'Error deleting product: ${e.toString()}');
+      _showErrorSnackbar(
+        'Delete Failed',
+        'Error deleting product: ${e.toString()}',
+      );
     } finally {
       isLoading.value = false;
       searchController.clear(); // Clear search ID if used in delete dialog

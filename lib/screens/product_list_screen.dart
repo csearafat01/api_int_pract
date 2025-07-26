@@ -49,10 +49,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           ElevatedButton(
             // The controller handles closing the dialog, etc.
             onPressed: productController.createProduct,
@@ -68,7 +65,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Future<void> _showUpdateProductDialog(String? productId) async {
     // Clear controllers if not pre-filling from an item
     if (productId == null) {
-      productController.searchController.clear(); // Using searchController for ID here for manual input
+      productController.searchController
+          .clear(); // Using searchController for ID here for manual input
       productController.nameController.clear();
       productController.dataController.clear();
     } else {
@@ -84,14 +82,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: productController.searchController, // Using searchController for ID input
-                decoration: const InputDecoration(labelText: 'Product ID to Update'),
+                controller: productController.searchController,
+                // Using searchController for ID input
+                decoration: const InputDecoration(
+                  labelText: 'Product ID to Update',
+                ),
                 keyboardType: TextInputType.text,
                 readOnly: productId != null, // Make ID read-only if pre-filled
               ),
               TextField(
                 controller: productController.nameController,
-                decoration: const InputDecoration(labelText: 'New Product Name'),
+                decoration: const InputDecoration(
+                  labelText: 'New Product Name',
+                ),
               ),
               TextField(
                 controller: productController.dataController,
@@ -115,7 +118,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 // The controller handles closing the dialog, etc.
                 productController.updateProduct(id);
               } else {
-                Get.snackbar('Input Error', 'Product ID cannot be empty.', backgroundColor: Colors.red, colorText: Colors.white);
+                Get.snackbar(
+                  'Input Error',
+                  'Product ID cannot be empty.',
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
               }
             },
             child: const Text('Update'),
@@ -130,14 +138,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
     if (productId == null) {
       productController.searchController.clear(); // Clear for manual ID entry
     } else {
-      productController.searchController.text = productId; // Pre-fill ID if called from list item
+      productController.searchController.text =
+          productId; // Pre-fill ID if called from list item
     }
 
     return Get.dialog(
       AlertDialog(
         title: const Text('Delete Product'),
         content: TextField(
-          controller: productController.searchController, // Using searchController for ID input
+          controller: productController.searchController,
+          // Using searchController for ID input
           decoration: const InputDecoration(labelText: 'Product ID to Delete'),
           keyboardType: TextInputType.text,
           readOnly: productId != null, // Make ID read-only if pre-filled
@@ -151,7 +161,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 // The controller handles closing the dialog, etc.
                 productController.deleteProduct(id);
               } else {
-                Get.snackbar('Input Error', 'Product ID cannot be empty for DELETE.', backgroundColor: Colors.red, colorText: Colors.white);
+                Get.snackbar(
+                  'Input Error',
+                  'Product ID cannot be empty for DELETE.',
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -166,15 +181,17 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter API Demo (GetX)'),
+        title: const Text('Flutter API '),
         centerTitle: true,
         actions: [
-          Obx(() =>
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: productController.isLoading.value ? null : productController.fetchAllProducts,
-                tooltip: 'Refresh All Products',
-              ),
+          Obx(
+            () => IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: productController.isLoading.value
+                  ? null
+                  : productController.fetchAllProducts,
+              tooltip: 'Refresh All Products',
+            ),
           ),
         ],
       ),
@@ -187,7 +204,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: productController.searchController, // Shared text field for search IDs
+                    controller: productController.searchController,
+                    // Shared text field for search IDs
                     decoration: const InputDecoration(
                       labelText: 'Search by ID(s)',
                       hintText: 'e.g., 7 (single) or 1,2,3 (multi)',
@@ -198,12 +216,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: productController.isLoading.value ? null : productController.fetchProductById,
+                  onPressed: productController.isLoading.value
+                      ? null
+                      : productController.fetchProductById,
                   child: const Text('Get Single'),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: productController.isLoading.value ? null : productController.fetchProductsByMultipleIds,
+                  onPressed: productController.isLoading.value
+                      ? null
+                      : productController.fetchProductsByMultipleIds,
                   child: const Text('Get Multi'),
                 ),
               ],
@@ -224,12 +246,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   label: const Text('POST (Create)'),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => _showUpdateProductDialog(null), // Call with null to manually enter ID
+                  onPressed: () => _showUpdateProductDialog(null),
+                  // Call with null to manually enter ID
                   icon: const Icon(Icons.edit),
                   label: const Text('PUT (Update)'),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => _showDeleteProductDialog(null), // Call with null to manually enter ID
+                  onPressed: () => _showDeleteProductDialog(null),
+                  // Call with null to manually enter ID
                   icon: const Icon(Icons.delete_forever),
                   label: const Text('DELETE'),
                   style: ElevatedButton.styleFrom(
@@ -244,10 +268,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
           // Product List Display Section
           Obx(() {
-            if (productController.isLoading.value && productController.products.isEmpty) {
+            if (productController.isLoading.value &&
+                productController.products.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             } else if (productController.products.isEmpty) {
-              return const Center(child: Text('No products found. Use search or create one!'));
+              return const Center(
+                child: Text('No products found. Use search or create one!'),
+              );
             } else {
               return Expanded(
                 child: ListView.builder(
@@ -255,25 +282,43 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   itemBuilder: (context, index) {
                     final product = productController.products[index];
                     return Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       elevation: 2,
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(12),
                         title: Text(
                           product.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('ID: ${product.id}', style: TextStyle(fontSize: 13, color: Colors.grey[700])),
-                            if (product.data != null && product.data!.isNotEmpty) // Check if data is not empty
+                            Text(
+                              'ID: ${product.id}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            if (product.data != null &&
+                                product
+                                    .data!
+                                    .isNotEmpty) // Check if data is not empty
                               Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
                                 child: Text(
                                   // Use `jsonEncode` for pretty printing Map data
                                   'Details: ${jsonEncode(product.data)}',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ),
                           ],
@@ -282,19 +327,29 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.edit_note, color: Colors.blue),
+                              icon: const Icon(
+                                Icons.edit_note,
+                                color: Colors.blue,
+                              ),
                               onPressed: () {
                                 // Pre-fill controllers for editing
-                                productController.searchController.text = product.id;
-                                productController.nameController.text = product.name;
-                                productController.dataController.text = jsonEncode(product.data ?? {});
-                                _showUpdateProductDialog(product.id); // Pass ID to pre-fill in dialog
+                                productController.searchController.text =
+                                    product.id;
+                                productController.nameController.text =
+                                    product.name;
+                                productController.dataController.text =
+                                    jsonEncode(product.data ?? {});
+                                _showUpdateProductDialog(
+                                  product.id,
+                                ); // Pass ID to pre-fill in dialog
                               },
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
-                                _showDeleteProductDialog(product.id); // Pass ID to pre-fill in dialog
+                                _showDeleteProductDialog(
+                                  product.id,
+                                ); // Pass ID to pre-fill in dialog
                               },
                             ),
                           ],

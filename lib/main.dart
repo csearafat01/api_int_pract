@@ -18,6 +18,5 @@ class MyApp extends StatelessWidget {
       initialBinding: ProductBinding(), // ✅ required
       home: const ProductListScreen(),
     );
-
   }
 }
